@@ -74,7 +74,8 @@ const [categoryFilter, setCategoryFilter] = useState();
         advance: Number(newOrder.advance),
         due: due,
         profit: profit,
-        category: newOrder.category,
+       category: newOrder.category,
+
         // no month saved
       },
     ]);
@@ -116,13 +117,22 @@ const [categoryFilter, setCategoryFilter] = useState();
   }, []);
 
   // Filter orders client-side by month selected
-  const filteredOrders = orders.filter((order) => {
-    if (!order.created_at) return false; // skip if no date
+ const filteredOrders = orders.filter(order => {
+  if (!order.created_at) return false;
 
-    const orderDate = new Date(order.created_at);
-    const orderMonthYear = orderDate.toLocaleString('default', { month: 'long', year: 'numeric' });
-    return orderMonthYear === selectedMonth;
-  });
+  const orderDate = new Date(order.created_at);
+  const orderMonthYear = orderDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+  if (orderMonthYear !== selectedMonth) return false;
+
+  if (
+    categoryFilter &&
+    (order.category ?? '').toString().trim().toLowerCase() !== categoryFilter.trim().toLowerCase()
+  )
+    return false;
+
+  return true;
+});
+
 
   const months = getMonthStrings();
 
@@ -152,10 +162,10 @@ const [categoryFilter, setCategoryFilter] = useState();
       </div>
 <div style={{ marginBottom: '20px' }}>
   <label style={{ marginRight: '10px', fontWeight: 'bold' }}>Filter by Category:</label>
-  {[ 'Blouse', 'Crop-top', 'Chudidar', 'Gown'].map((cat) => (
+  {['Blouse', 'Crop-top', 'Chudidar', 'Gown'].map((cat) => (
     <button
       key={cat}
-      onClick={() => setCategoryFilter(cat)}
+      onClick={() => setCategoryFilter(cat === categoryFilter ? null : cat)} 
       style={{
         marginRight: '8px',
         backgroundColor: categoryFilter === cat ? '#007bff' : '#eee',
@@ -170,6 +180,7 @@ const [categoryFilter, setCategoryFilter] = useState();
     </button>
   ))}
 </div>
+
 
       {/* Add Order Section */}
       <h3>Add Order</h3>
@@ -307,23 +318,21 @@ const [categoryFilter, setCategoryFilter] = useState();
           </thead>
           
           <tbody>
-  {orders
-    .filter(order => categoryFilter === 'All' || order.category === categoryFilter)
-    .map((order) => (
-      <tr key={order.id}>
-        <td>{order.customer}</td>
-        <td>{order.blouse_no}</td>
-        <td>{order.stitching}</td>
-        <td>{order.work}</td>
-                <td>Rs.{order.work_charge}</td>
-                <td>Rs.{order.selling_price}</td>
-                <td>Rs.{order.advance}</td>
-                <td>Rs.{order.due}</td>
-                <td>Rs.{order.profit}</td>
-        {/* ... other columns */}
-      </tr>
-    ))}
+  {filteredOrders.map(order => (
+    <tr key={order.id}>
+      <td>{order.customer}</td>
+      <td>{order.blouse_no}</td>
+      <td>{order.stitching}</td>
+      <td>{order.work}</td>
+      <td>Rs.{order.work_charge}</td>
+      <td>Rs.{order.selling_price}</td>
+      <td>Rs.{order.advance}</td>
+      <td>Rs.{order.due}</td>
+      <td>Rs.{order.profit}</td>
+    </tr>
+  ))}
 </tbody>
+
 
         </table>
       )}
