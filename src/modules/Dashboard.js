@@ -3,7 +3,7 @@ import { supabase } from './supabase';
 
 const stitchingOptions = ['Simple', 'Fancy', 'Deluxe'];
 const workOptions = ['Embroidery', 'Print', 'Plain'];
-
+const category = ['Blouse','Crop-top','Chudidar','Gown'];
 const getMonthStrings = () => {
   const months = ['August 2025','September 2025','October 2025','November 2025','December 2025'];
   return months;
@@ -28,7 +28,7 @@ const [categoryFilter, setCategoryFilter] = useState();
   work: '',
   work_charge: 0,
   advance: 0,
-  category: '', // default category
+  category: 'Blouse', 
 });
 
 
@@ -80,7 +80,7 @@ const [categoryFilter, setCategoryFilter] = useState();
       },
     ]);
     setAdding(false);
-
+console.log(newOrder);
     if (error) {
       console.error('Insert error:', error.message);
       alert('Failed to add order.');
@@ -92,6 +92,7 @@ const [categoryFilter, setCategoryFilter] = useState();
         work: workOptions[0],
         work_charge: 0,
         advance: 0,
+        category : category[0],
       });
       fetchOrders();
     }
@@ -123,9 +124,6 @@ const [categoryFilter, setCategoryFilter] = useState();
   const orderDate = new Date(order.created_at);
   const orderMonthYear = orderDate.toLocaleString('default', { month: 'long', year: 'numeric' });
   if (orderMonthYear !== selectedMonth) return false;
-  if (process.env.NODE_ENV === 'production') {
-    console.log('[DEBUG] Filter check → order.category:', order.category, '| selected filter:', categoryFilter);
-  }
   if (
     categoryFilter &&
     (order.category ?? '').toString().trim().toLowerCase() !== categoryFilter.trim().toLowerCase()
@@ -208,7 +206,7 @@ const [categoryFilter, setCategoryFilter] = useState();
       style={{ marginRight: '10px' }}
     />
   </div>
-
+{/* 
 <div style={{ marginBottom: '10px' }}>
   <label style={{ marginRight: '10px', fontWeight: 'bold' }}>Category:</label>
   <select
@@ -220,9 +218,21 @@ const [categoryFilter, setCategoryFilter] = useState();
     <option value="Chudidar">Chudidar</option>
     <option value="Gown">Gown</option>
   </select>
-</div>
+</div> */}
 
-
+<div style={{ marginBottom: '8px' }}>
+    <label htmlFor="work" style={{ marginRight: '8px' }}>Category:</label>
+    <select
+      id="work"
+      value={newOrder.category}
+      onChange={(e) => setNewOrder({ ...newOrder, category: e.target.value })}
+      style={{ marginRight: '10px' }}
+    >
+      {category.map((opt) => (
+        <option key={opt} value={opt}>{opt}</option>
+      ))}
+    </select>
+  </div>
 
   <div style={{ marginBottom: '8px' }}>
     <label htmlFor="stitching" style={{ marginRight: '8px' }}>Stitching:</label>
