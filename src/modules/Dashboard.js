@@ -123,7 +123,9 @@ const [categoryFilter, setCategoryFilter] = useState();
   const orderDate = new Date(order.created_at);
   const orderMonthYear = orderDate.toLocaleString('default', { month: 'long', year: 'numeric' });
   if (orderMonthYear !== selectedMonth) return false;
-
+  if (process.env.NODE_ENV === 'production') {
+    console.log('[DEBUG] Filter check → order.category:', order.category, '| selected filter:', categoryFilter);
+  }
   if (
     categoryFilter &&
     (order.category ?? '').toString().trim().toLowerCase() !== categoryFilter.trim().toLowerCase()
